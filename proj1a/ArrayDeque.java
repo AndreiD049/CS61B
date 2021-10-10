@@ -8,7 +8,7 @@ public class ArrayDeque<T> {
     private T[] items;
     private int size;
     /**
-     * Necessary to handle addition to the fron of the list.
+     * Necessary to handle addition to the front of the list.
      * When element is added to the front of the list
      * we don't move all the elements of the array to the right
      * instead, we move frontIndex to the left (in circular manner),
