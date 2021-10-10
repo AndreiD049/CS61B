@@ -1,3 +1,7 @@
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 /** Performs some basic linked list tests. */
 public class LinkedListDequeTest {
 	
@@ -84,5 +88,48 @@ public class LinkedListDequeTest {
 		System.out.println("Running tests.\n");
 		addIsEmptySizeTest();
 		addRemoveTest();
+	}
+
+	@Test
+	public void testInsert() {
+		LinkedListDeque<Integer> list = new LinkedListDeque<>();
+		list.addLast(10);
+		list.addLast(30);
+		list.addLast(40);
+		list.insert(20, 1);
+		assertTrue(list.size() == 4);
+		assertTrue(list.get(1) == 20);
+	}
+
+	@Test
+	public void insertPastListLength() {
+		LinkedListDeque<Integer> list = new LinkedListDeque<>();
+		list.addLast(10);
+		list.insert(20, 100);
+		assertTrue(list.size() == 2);
+		assertTrue(list.get(1) == 20);
+	}
+
+	@Test
+	public void reverseTest() {
+		LinkedListDeque<Integer> list = new LinkedListDeque<>();
+		list.addLast(30);
+		list.addLast(20);
+		list.addLast(10);
+		list.reverseRecursive();
+		list.printDeque();
+		assertTrue(list.size() == 3);
+		assertTrue(list.get(0) == 10);
+		assertTrue(list.get(1) == 20);
+		assertTrue(list.get(2) == 30);
+	}
+
+	@Test
+	public void reverseEmpty() {
+		LinkedListDeque<Integer> list = new LinkedListDeque<>();
+		list.reverseRecursive();
+		assertTrue(list.size() == 0);
+		list.reverse();
+		assertTrue(list.size() == 0);
 	}
 } 

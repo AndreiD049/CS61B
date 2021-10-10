@@ -115,6 +115,30 @@ public class LinkedListDeque<T> {
     }
 
     /**
+     * Insert an item at index.
+     * S <--> 1 <--> 3 <--> 4
+     * S <--> 1 (<--> 2) <--> 3 <--> 4
+     * 2.next will be set to 3
+     * 2.prev will be set to 3.prev
+     * 3.prev will be set to 2
+     * 2.prev.next will be set to 2
+     * if index is past list size, call addLast
+     * @param item - item to be inserted
+     * @param index - index at which to insert the item
+     */
+    public void insert(T item, int index) {
+        if (index >= size) {
+            addLast(item);
+            return;
+        }
+        Node current = getNode(index);
+        Node newItem = new Node(item, current.prev, current);
+        current.prev = newItem;
+        newItem.prev.next = newItem;
+        size += 1;
+    }
+
+    /**
      * Removes and returns the first item. If no such item exists, return null
      * S <--> 1 <--> 2
      * S.next --> 2
@@ -176,6 +200,15 @@ public class LinkedListDeque<T> {
      * exist or index is negative
      */
     public T get(int index) {
+        return getNode(index).item;
+    }
+
+    /**
+     * ! Internal use: get node at position index.
+     * @param index - index to search
+     * @return the Node at index or null if index is invalid
+     */
+    private Node getNode(int index) {
         if (size <= index || index < 0) {
             return null;
         }
@@ -183,7 +216,42 @@ public class LinkedListDeque<T> {
         for (int i = 0; i < index; i++) {
             node = node.next;
         }
-        return node.item;
+        return node;
+    }
+
+    /**
+     * Reverses the list.
+     * Doesn't allocate new nodes
+     * S <--> 3 <--> 2 <--> 1.
+     * |__________________|
+     * 1 <--> 2 <--> 3 <--> S
+     * |____________________|
+     */
+    public void reverse() {
+        Node p = sentinel;
+        for (int i = 0; i <= size; i++) {
+            Node next = p.next;
+            p.next = p.prev;
+            p.prev = next;
+            p = next;
+        }
+    }
+
+    /**
+     * Reverse the list recursively.
+     */
+    public void reverseRecursive() {
+        reverseRecursiveHelper(sentinel.next);
+    }
+
+    public void reverseRecursiveHelper(Node p) {
+        Node next = p.next;
+        p.next = p.prev;
+        p.prev = next;
+        if (p == sentinel) {
+            return;
+        }
+        reverseRecursiveHelper(next);
     }
 
     /**
