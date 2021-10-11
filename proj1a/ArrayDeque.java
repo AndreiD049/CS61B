@@ -71,8 +71,9 @@ public class ArrayDeque<T> {
         if (shouldShrink()) {
             resize(size * 2);
         }
-        T result = items[size - 1];
-        items[size - 1] = null;
+        int index = (frontIndex + size - 1) % items.length;
+        T result = items[index];
+        items[index] = null;
         size -= 1;
         return result;
     }

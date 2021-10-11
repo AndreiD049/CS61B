@@ -1,6 +1,7 @@
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 public class ArrayDequeTest {
     @Test
@@ -151,5 +152,31 @@ public class ArrayDequeTest {
             list.removeLast();
         }
         assertTrue(list.arraySize() < 1000);
+    }
+
+    @Test
+    public void testRemoveFirstLast() {
+        ArrayDeque<Integer> list = new ArrayDeque<>();
+        list.addLast(1);
+        list.addLast(2);
+        list.addLast(3);
+        list.addLast(4);
+        int a = list.removeFirst();
+        assertEquals(a, 1);
+        int b = list.removeLast();
+        assertEquals(b, 4);
+    }
+
+    @Test
+    public void testFirstRemoveFirstLast() {
+        ArrayDeque<Integer> list = new ArrayDeque<>();
+        list.addFirst(1);
+        list.addFirst(2);
+        list.addFirst(3);
+        list.addFirst(4);
+        int a = list.removeFirst();
+        assertEquals(a, 4);
+        int b = list.removeLast();
+        assertEquals(b, 1);
     }
 }
