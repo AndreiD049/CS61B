@@ -68,7 +68,7 @@ public class ArrayDeque<T> {
         if (isEmpty()) {
             return null;
         }
-        if (getUsageFactor() < 0.25) {
+        if (shouldShrink()) {
             resize(size * 2);
         }
         T result = items[size - 1];
@@ -86,7 +86,7 @@ public class ArrayDeque<T> {
         if (isEmpty()) {
             return null;
         }
-        if (getUsageFactor() < 0.25) {
+        if (shouldShrink()) {
             resize(size * 2);
         }
         T removed = items[frontIndex];
@@ -154,6 +154,12 @@ public class ArrayDeque<T> {
         return (double)size / items.length;
     }
 
+    /**
+     * Resize the items array to the given capacity
+     * Will copy the contents of current items,
+     * taking into account frontIndex
+     * @param capacity - the desired capacity
+     */
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
         int srcStartIndex = frontIndex;
@@ -171,6 +177,19 @@ public class ArrayDeque<T> {
         }
         frontIndex = 0;
         items = newArray;
+    }
+
+    /**
+     * Checks whether items array should shrink.
+     * Given current usage and size, checks whether array will shrink.
+     * @return true if array should shrink, false otherwise
+     */
+    private boolean shouldShrink() {
+        double usageFactor = getUsageFactor();
+        if (items.length > 16 && usageFactor < 0.25) {
+            return true;
+        }
+        return usageFactor < 0.125;
     }
 
     /**
