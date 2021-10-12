@@ -40,4 +40,18 @@ public class TestPalindrome {
         assertTrue(palindrome.isPalindrome(""));
     }
 
+    @Test
+    public void testCustomComparator() {
+        CharacterComparator cc = new OffByOne();
+        assertTrue(palindrome.isPalindrome("flake", cc));
+        assertTrue(palindrome.isPalindrome("a", cc));
+        assertTrue(palindrome.isPalindrome("ab", cc));
+        assertTrue(palindrome.isPalindrome("ba", cc));
+        assertTrue(palindrome.isPalindrome("aib", cc));
+
+        assertFalse(palindrome.isPalindrome("cat", cc));
+        assertFalse(palindrome.isPalindrome("mom", cc));
+        assertFalse(palindrome.isPalindrome("palindrome", cc));
+    }
+
 }

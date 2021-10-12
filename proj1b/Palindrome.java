@@ -40,4 +40,27 @@ public class Palindrome {
         return isPalindrome(deque);
     }
 
+    /**
+     * Verifies if the word is a palindrome.
+     * According to the rules of a comparator
+     * @param word - word to be checked
+     * @param cc - custom comparator
+     * @return true if word is a palindrome, false otherwise
+     */
+    public boolean isPalindrome(String word, CharacterComparator cc) {
+        return isPalindrome(wordToDeque(word), cc);
+    }
+
+    private boolean isPalindrome(Deque<Character> deque, CharacterComparator cc) {
+        if (deque.size() <= 1) {
+            return true;
+        }
+        Character first = deque.removeFirst();
+        Character last = deque.removeLast();
+        if (!cc.equalChars(first, last)) {
+            return false;
+        }
+        return isPalindrome(deque, cc);
+    }
+
 }
