@@ -10,12 +10,20 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 
+import static huglife.HugLifeUtils.random;
+import static huglife.HugLifeUtils.randomEntry;
+
 /**
  * An implementation of a motile pacifist photosynthesizer.
  *
  * @author Josh Hug
  */
 public class Plip extends Creature {
+    /** the amount of energy lost during move */
+    private static final double energyLoss = 0.15;
+
+    /** the amount of energy saved while staying, due to photosynthesis */
+    private static final double energyGain = 0.2;
 
     /**
      * red color.
@@ -38,7 +46,7 @@ public class Plip extends Creature {
         r = 0;
         g = 0;
         b = 0;
-        energy = e;
+        setEnergy(e);
     }
 
     /**
@@ -57,7 +65,9 @@ public class Plip extends Creature {
      * that you get this exactly correct.
      */
     public Color color() {
-        g = 63;
+        r = 99;
+        b = 76;
+        g = (int) (63 + energy * 96) % 256;
         return color(r, g, b);
     }
 
@@ -70,11 +80,11 @@ public class Plip extends Creature {
 
     /**
      * Plips should lose 0.15 units of energy when moving. If you want to
-     * to avoid the magic number warning, you'll need to make a
+     * avoid the magic number warning, you'll need to make a
      * private static final variable. This is not required for this lab.
      */
     public void move() {
-        // TODO
+        setEnergy(energy - energyLoss);
     }
 
 
@@ -82,7 +92,7 @@ public class Plip extends Creature {
      * Plips gain 0.2 energy when staying due to photosynthesis.
      */
     public void stay() {
-        // TODO
+        setEnergy(energy + energyGain);
     }
 
     /**
@@ -91,7 +101,8 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        return this;
+        setEnergy(energy / 2);
+        return new Plip(energy);
     }
 
     /**
@@ -114,17 +125,44 @@ public class Plip extends Creature {
         // TODO
         // (Google: Enhanced for-loop over keys of NEIGHBORS?)
         // for () {...}
+        for (Direction dir: neighbors.keySet()) {
+            Occupant neighbor = neighbors.get(dir);
+            if (neighbor.name().equals("empty")) {
+                emptyNeighbors.add(dir);
+            } else if (neighbor.name().equals("clorus")) {
+                anyClorus = true;
+            }
+        }
 
-        if (false) { // FIXME
-            // TODO
+        if (emptyNeighbors.size() == 0) {
+            return new Action(Action.ActionType.STAY);
         }
 
         // Rule 2
-        // HINT: randomEntry(emptyNeighbors)
+        if (energy >= 1.0) {
+            Direction dir = randomEntry(emptyNeighbors);
+            return new Action(Action.ActionType.REPLICATE, dir);
+        }
 
         // Rule 3
+        if (anyClorus) {
+            if (random() < 0.5) {
+                Direction dir = randomEntry(emptyNeighbors);
+                return new Action(Action.ActionType.MOVE, dir);
+            }
+        }
 
         // Rule 4
         return new Action(Action.ActionType.STAY);
+    }
+
+    /**
+     * Makes sure plip's energy never goes out of bounds.
+     * Maximum energy = 2
+     * Minimum energy = 0
+     */
+    private void setEnergy(double e) {
+        energy = Math.min(e, 2);
+        energy = Math.max(energy, 0);
     }
 }
