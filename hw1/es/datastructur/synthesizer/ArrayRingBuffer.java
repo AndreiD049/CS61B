@@ -1,59 +1,144 @@
 package es.datastructur.synthesizer;
 import java.util.Iterator;
 
-//TODO: Make sure to that this class and all of its methods are public
-//TODO: Make sure to add the override tag for all overridden methods
-//TODO: Make sure to make this class implement BoundedQueue<T>
-
-public class ArrayRingBuffer<T>  {
-    /* Index for the next dequeue or peek. */
+/** Array Ring buffer data structure.
+ * @author Andrei Dimitrascu
+ */
+public class ArrayRingBuffer<T> implements BoundedQueue<T> {
+    /** Index for the next dequeue or peek. */
     private int first;
-    /* Index for the next enqueue. */
+    /** Index for the next enqueue. */
     private int last;
-    /* Variable for the fillCount. */
+    /** Variable for the fillCount. */
     private int fillCount;
-    /* Array for storing the buffer data. */
-    private T[] rb;
+    /** Array for storing the buffer data. */
+    private final T[] rb;
 
-    /**
-     * Create a new ArrayRingBuffer with the given capacity.
-     */
-    public ArrayRingBuffer(int capacity) {
-        // TODO: Create new array with capacity elements.
-        //       first, last, and fillCount should all be set to 0.
+    /** Ring Buffer iterator inner class. */
+    private class RingBufferIterator implements Iterator<T> {
+        /** current element processed by iterator. */
+        private int currentEl;
+
+        /** Construct a new Iterator. */
+        RingBufferIterator() {
+            currentEl = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentEl < fillCount;
+        }
+
+        @Override
+        public T next() {
+            T result = rb[wrapIndex(first + currentEl)];
+            currentEl += 1;
+            return result;
+        }
     }
 
     /**
-     * Adds x to the end of the ring buffer. If there is no room, then
-     * throw new RuntimeException("Ring buffer overflow").
+     * Create a new ArrayRingBuffer with the given capacity.
+     * @param capacity - maximum capacity of the array
      */
+    public ArrayRingBuffer(int capacity) {
+        rb = (T[]) new Object[capacity];
+        fillCount = 0;
+        first = 0;
+        last = 0;
+    }
+
+    @Override
+    public int capacity() {
+        return rb.length;
+    }
+
+    @Override
+    public int fillCount() {
+        return fillCount;
+    }
+
+    /**
+     * Adds x to the end of the ring buffer.
+     * if no room, throw new RuntimeException("Ring buffer overflow").
+     */
+    @Override
     public void enqueue(T x) {
-        // TODO: Enqueue the item. Don't forget to increase fillCount and update
-        //       last.
-        return;
+        if (isFull()) {
+            throw new RuntimeException("Ring Buffer overflow");
+        }
+        rb[last] = x;
+        last = wrapIndex(last + 1);
+        fillCount += 1;
     }
 
     /**
      * Dequeue oldest item in the ring buffer. If the buffer is empty, then
      * throw new RuntimeException("Ring buffer underflow").
      */
+    @Override
     public T dequeue() {
-        // TODO: Dequeue the first item. Don't forget to decrease fillCount and
-        //       update first.
-        return null;
+        if (isEmpty()) {
+            throw new RuntimeException("Ring buffer underflow");
+        }
+        T result = rb[first];
+        first = wrapIndex(first + 1);
+        fillCount -= 1;
+        return result;
     }
 
     /**
      * Return oldest item, but don't remove it. If the buffer is empty, then
      * throw new RuntimeException("Ring buffer underflow").
      */
+    @Override
     public T peek() {
-        // TODO: Return the first item. None of your instance variables should
-        //       change.
-        return null;
+        if (isEmpty()) {
+            throw new RuntimeException("Ring buffer underflow");
+        }
+        return rb[first];
     }
 
-    // TODO: When you get to part 4, implement the needed code to support
-    //       iteration and equals.
+    /**
+     * returns the wrapped index if it goes out of bounds.
+     * Ex: if currentIndex is 5 and capacity is 5, then returns 0
+     * Ex: if currentIndex is 6 and capacity is 5,
+     * then returns 1 (should not happen)
+     * @param currentIndex new index
+     */
+    private int wrapIndex(int currentIndex) {
+        return currentIndex >= rb.length
+                ? currentIndex % rb.length
+                : currentIndex;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new RingBufferIterator();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (other.getClass() != this.getClass()) {
+            return false;
+        }
+        ArrayRingBuffer<T> otherArray = (ArrayRingBuffer<T>) other;
+        if (this.fillCount != otherArray.fillCount) {
+            return false;
+        }
+        for (int i = 0; i < this.fillCount; i += 1) {
+            T el1 = this.rb[wrapIndex(i + first)];
+            T el2 = otherArray.rb[otherArray.wrapIndex(i + otherArray.first)];
+            if (!el1.equals(el2)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
-    // TODO: Remove all comments that say TODO when you're done.
